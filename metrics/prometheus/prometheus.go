@@ -11,6 +11,10 @@ import (
 	"github.com/go-kit/kit/metrics/internal/lv"
 )
 
+type Deleter interface {
+	Delete(lvs ...string) bool
+}
+
 // Counter implements Counter, via a Prometheus CounterVec.
 type Counter struct {
 	cv  *prometheus.CounterVec
@@ -43,6 +47,10 @@ func (c *Counter) With(labelValues ...string) metrics.Counter {
 // Add implements Counter.
 func (c *Counter) Add(delta float64) {
 	c.cv.With(makeLabels(c.lvs...)).Add(delta)
+}
+
+func (c *Counter) Delete(lvs ...string) bool {
+	return c.cv.DeleteLabelValues(lvs...)
 }
 
 // Gauge implements Gauge, via a Prometheus GaugeVec.
